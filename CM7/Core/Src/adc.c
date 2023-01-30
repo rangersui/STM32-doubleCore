@@ -84,7 +84,6 @@ void MX_ADC3_Init(void)
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(adcHandle->Instance==ADC3)
   {
@@ -111,15 +110,6 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 
     /* ADC3 clock enable */
     __HAL_RCC_ADC3_CLK_ENABLE();
-
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-    /**ADC3 GPIO Configuration
-    PF8     ------> ADC3_INP7
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_8;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
     /* ADC3 DMA Init */
     /* ADC3 Init */
@@ -156,11 +146,6 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
   /* USER CODE END ADC3_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_ADC3_CLK_DISABLE();
-
-    /**ADC3 GPIO Configuration
-    PF8     ------> ADC3_INP7
-    */
-    HAL_GPIO_DeInit(GPIOF, GPIO_PIN_8);
 
     /* ADC3 DMA DeInit */
     HAL_DMA_DeInit(adcHandle->DMA_Handle);

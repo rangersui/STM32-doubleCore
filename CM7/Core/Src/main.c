@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "dma.h"
 #include "tim.h"
 #include "gpio.h"
@@ -49,7 +48,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t rawADCValue[ADC_SIZE];
+// uint16_t rawADCValue[ADC_SIZE];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -123,23 +122,26 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_ADC3_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start(&htim2);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  HAL_ADC_Start_DMA(&hadc3, (uint32_t*)rawADCValue, ADC_SIZE);
-  
+  // // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
+  // HAL_TIM_Base_Start(&htim2);
+  // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  // HAL_ADC_Start_DMA(&hadc3, (uint32_t *)rawADCValue, ADC_SIZE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    
-    HAL_Delay(1);
-    //HAL_UART_Transmit(&huart1, (uint8_t *)"OUT", sizeof("OUT"), 10);
-    //HAL_Delay(1000);
+    // // LD7 flashes when functioning properly
+    // HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
+    // HAL_Delay(5000);
+    // HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
+    // HAL_Delay(10);
+
+    // HAL_UART_Transmit(&huart1, (uint8_t *)"OUT", sizeof("OUT"), 10);
+    // HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -225,6 +227,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+    // // Toggles at 1Hz on error (LD6,Red LED)
+    // HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
+    // HAL_Delay(1000);
   }
   /* USER CODE END Error_Handler_Debug */
 }

@@ -2196,10 +2196,16 @@
             <name>$PROJ_DIR$\..\CM4\Core\Src\main.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$\..\CM4\Core\Src\gpio.c</name>
+            <name>$PROJ_DIR$/../CM4/Core/Src/gpio.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$/../CM4/Core/Src/adc.c</name>
           </file>
           <file>
             <name>$PROJ_DIR$/../CM4/Core/Src/dma.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$/../CM4/Core/Src/tim.c</name>
           </file>
           <file>
             <name>$PROJ_DIR$\..\CM4\Core\Src\stm32h7xx_it.c</name>
@@ -2256,15 +2262,9 @@
       <name>STM32H7xx_HAL_Driver</name>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_adc.c</name>
-        <excluded>
-          <configuration>single_CM4</configuration>
-        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_adc_ex.c</name>
-        <excluded>
-          <configuration>single_CM4</configuration>
-        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_rcc.c</name>

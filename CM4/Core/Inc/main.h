@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -57,14 +57,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define OSC32_OUT_Pin GPIO_PIN_15
-#define OSC32_OUT_GPIO_Port GPIOC
-#define OSC32_IN_Pin GPIO_PIN_14
-#define OSC32_IN_GPIO_Port GPIOC
+#define LD6_Pin GPIO_PIN_13
+#define LD6_GPIO_Port GPIOI
 #define OSC_OUT_Pin GPIO_PIN_1
 #define OSC_OUT_GPIO_Port GPIOH
 #define OSC_IN_Pin GPIO_PIN_0
 #define OSC_IN_GPIO_Port GPIOH
+#define LD7_Pin GPIO_PIN_2
+#define LD7_GPIO_Port GPIOJ
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

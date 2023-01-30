@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.general.xcl" --backend -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.driver.xcl" 
+"D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.general.xcl" --backend -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.general.xcl" "--debug_file=%~1" --backend -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.driver.xcl" 
+"D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.general.xcl" "--debug_file=%~1" --backend -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.driver.xcl" 
 
 @echo off 
 :end

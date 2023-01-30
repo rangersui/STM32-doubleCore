@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.general.xcl" --backend -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.driver.xcl" 
+& "D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.general.xcl" --backend -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.driver.xcl" 
 }
 else
 {
-& "D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.general.xcl" --debug_file=$debugfile --backend -f "D:\Progr\doubleCore\single\single\EWARM\settings\single.single_CM4.driver.xcl" 
+& "D:\Sof\Dev\EARM\common\bin\cspybat" -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.general.xcl" --debug_file=$debugfile --backend -f "D:\Progr\doubleCore\single\doubleCore\EWARM\settings\single.single_CM4.driver.xcl" 
 }
