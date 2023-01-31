@@ -2,3 +2,6 @@
 *.pdf
 .vscode/
 *.code-workspace
+/EWARM/settings
+/EWARM/single_CM4
+/EWARM/single_CM7
