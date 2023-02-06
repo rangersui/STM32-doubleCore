@@ -35,9 +35,10 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#ifndef HSEM_ID_0
-#define HSEM_ID_0 (0U) /* HW semaphore 0*/
-#endif
+// #ifndef HSEM_ID_0
+// #define HSEM_ID_0 (0U) /* HW semaphore 0*/
+// #endif
+#define SHARED_ADDRESS 0x30040000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,7 +49,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-// uint16_t rawADCValue[ADC_SIZE];
+volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared memory address pointer, points to the shared memory array in SDRAM
+uint16_t array[1000];
+uint32_t Notif_Recieved = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,28 +66,28 @@ void SystemClock_Config(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-/* USER CODE BEGIN Boot_Mode_Sequence_0 */
+  /* USER CODE BEGIN Boot_Mode_Sequence_0 */
   int32_t timeout;
-/* USER CODE END Boot_Mode_Sequence_0 */
+  /* USER CODE END Boot_Mode_Sequence_0 */
 
-/* USER CODE BEGIN Boot_Mode_Sequence_1 */
+  /* USER CODE BEGIN Boot_Mode_Sequence_1 */
   /* Wait until CPU2 boots and enters in stop mode or timeout*/
-  timeout = 0xFFFF;
-  while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0))
-    ;
-  if (timeout < 0)
-  {
-    Error_Handler();
-  }
-/* USER CODE END Boot_Mode_Sequence_1 */
+  // timeout = 0xFFFF;
+  // while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0))
+  //   ;
+  // if (timeout < 0)
+  // {
+  //   Error_Handler();
+  // }
+  /* USER CODE END Boot_Mode_Sequence_1 */
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -96,15 +99,15 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-/* USER CODE BEGIN Boot_Mode_Sequence_2 */
+  /* USER CODE BEGIN Boot_Mode_Sequence_2 */
   /* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
   HSEM notification */
   /*HW semaphore Clock enable*/
   __HAL_RCC_HSEM_CLK_ENABLE();
   /*Take HSEM */
-  HAL_HSEM_FastTake(HSEM_ID_0);
+  HAL_HSEM_FastTake(HSEM_ID_0_ADCOK);
   /*Release HSEM in order to notify the CPU2(CM4)*/
-  HAL_HSEM_Release(HSEM_ID_0, 0);
+  HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
   /* wait until CPU2 wakes up from stop mode */
   timeout = 0xFFFF;
   while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0))
@@ -113,7 +116,7 @@ int main(void)
   {
     Error_Handler();
   }
-/* USER CODE END Boot_Mode_Sequence_2 */
+  /* USER CODE END Boot_Mode_Sequence_2 */
 
   /* USER CODE BEGIN SysInit */
 
@@ -124,6 +127,7 @@ int main(void)
   MX_DMA_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
   // // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
   // HAL_TIM_Base_Start(&htim2);
   // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
@@ -134,6 +138,27 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // for (size_t i = 0; i < 1000; i++)
+    // {
+    //   array[i] = sharedMemoryAddress[i];
+    // }
+    // LD8 flashes when functioning properly
+    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
+    while (Notif_Recieved == 0)
+    {
+      /* code */
+    }
+    // take the semaphore to read the shared memory
+    HAL_HSEM_FastTake(HSEM_ID_0_ADCOK);
+    for (size_t i = 0; i < 1000; i++)
+    {
+      array[i] = sharedMemoryAddress[i];
+    }
+    HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
+    // HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
+    // HAL_Delay(5000);
+    // HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
+    // HAL_Delay(500);
     // // LD7 flashes when functioning properly
     // HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
     // HAL_Delay(5000);
@@ -150,31 +175,33 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Supply configuration update enable
-  */
+   */
   HAL_PWREx_ConfigSupply(PWR_DIRECT_SMPS_SUPPLY);
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
-  while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
+  while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
+  {
+  }
 
   /** Macro to configure the PLL clock source
-  */
+   */
   __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSI);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -194,10 +221,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
-                              |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
@@ -213,13 +238,18 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+// Once the HSEM is released, store the data in the shared memory
+void HAL_HSEM_FreeCallback(uint32_t SemMask)
+{
+  HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
+  Notif_Recieved = 1;
+}
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -227,21 +257,21 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-    // // Toggles at 1Hz on error (LD6,Red LED)
-    // HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
-    // HAL_Delay(1000);
+    // Toggles at 1Hz on error (LD6,Red LED)
+    HAL_GPIO_TogglePin(GPIOI, GPIO_PIN_13);
+    HAL_Delay(1000);
   }
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

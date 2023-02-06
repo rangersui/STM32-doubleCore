@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "tim.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -46,7 +46,8 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define ADC_SIZE 1000
+#define HSEM_ID_0_ADCOK (0U) /* HW semaphore 0*/
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -66,7 +67,8 @@ void Error_Handler(void);
 #define LD7_Pin GPIO_PIN_2
 #define LD7_GPIO_Port GPIOJ
 /* USER CODE BEGIN Private defines */
-
+extern volatile uint16_t* sharedMemoryAddress;
+extern uint16_t sharedADCValue[ADC_SIZE];
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

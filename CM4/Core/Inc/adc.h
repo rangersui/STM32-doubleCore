@@ -35,7 +35,7 @@ extern "C" {
 extern ADC_HandleTypeDef hadc3;
 
 /* USER CODE BEGIN Private defines */
-#define ADC_SIZE 1000
+
 /* USER CODE END Private defines */
 
 void MX_ADC3_Init(void);

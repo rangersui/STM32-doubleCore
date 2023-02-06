@@ -669,7 +669,7 @@
       <data>
         <extensions></extensions>
         <cmdline></cmdline>
-        <hasPrio>96</hasPrio>
+        <hasPrio>1</hasPrio>
         <buildSequence>inputOutputBased</buildSequence>
       </data>
     </settings>
@@ -2196,16 +2196,16 @@
             <name>$PROJ_DIR$\..\CM4\Core\Src\main.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$/../CM4/Core/Src/gpio.c</name>
+            <name>$PROJ_DIR$\..\CM4\Core\Src\gpio.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$/../CM4/Core/Src/adc.c</name>
+            <name>$PROJ_DIR$\..\CM4\Core\Src\adc.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$/../CM4/Core/Src/dma.c</name>
+            <name>$PROJ_DIR$\..\CM4\Core\Src\dma.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$/../CM4/Core/Src/tim.c</name>
+            <name>$PROJ_DIR$\..\CM4\Core\Src\tim.c</name>
           </file>
           <file>
             <name>$PROJ_DIR$\..\CM4\Core\Src\stm32h7xx_it.c</name>
@@ -2235,10 +2235,10 @@
             <name>$PROJ_DIR$\..\CM7\Core\Src\adc.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$/../CM7/Core/Src/dma.c</name>
+            <name>$PROJ_DIR$\..\CM7\Core\Src\dma.c</name>
           </file>
           <file>
-            <name>$PROJ_DIR$/../CM7/Core/Src/tim.c</name>
+            <name>$PROJ_DIR$\..\CM7\Core\Src\tim.c</name>
           </file>
           <file>
             <name>$PROJ_DIR$\..\CM7\Core\Src\stm32h7xx_it.c</name>
