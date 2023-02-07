@@ -19,7 +19,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dac.h"
 #include "dma.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -46,10 +48,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-// uint16_t rawADCValue[ADC_SIZE]; // TODO alter the rawADCValue to a shared memory
 //  intialize the shared memory and value array
 volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared memory address pointer, points to the shared memory array in SDRAM
 uint16_t sharedADCValue[ADC_SIZE] = {0};                             // shared memory array, stores in CM4's SRAM
+uint16_t DAC_Table[DAC_SIZE] = {0};                                  // DAC table, stores in CM4's RAM
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,16 +65,16 @@ uint16_t sharedADCValue[ADC_SIZE] = {0};                             // shared m
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
 
-  /* USER CODE BEGIN Boot_Mode_Sequence_1 */
+/* USER CODE BEGIN Boot_Mode_Sequence_1 */
   /*HW semaphore Clock enable*/
   __HAL_RCC_HSEM_CLK_ENABLE();
   /* Activate HSEM notification for Cortex-M4*/
@@ -86,7 +88,7 @@ int main(void)
   /* Clear HSEM flag */
   __HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
 
-  /* USER CODE END Boot_Mode_Sequence_1 */
+/* USER CODE END Boot_Mode_Sequence_1 */
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -104,12 +106,24 @@ int main(void)
   MX_DMA_Init();
   MX_ADC3_Init();
   MX_GPIO_Init();
+  MX_DAC1_Init();
+  MX_TIM6_Init(0,12000);
   /* USER CODE BEGIN 2 */
   MX_TIM2_Init();
   // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
   HAL_TIM_Base_Start(&htim2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   HAL_ADC_Start_DMA(&hadc3, (uint32_t *)sharedADCValue, ADC_SIZE);
+  // define dac parameters
+  uint16_t DAC_Ampl = 1000;
+  uint16_t DAC_DC = 2048;
+  // uint32_t DAC_Freq = 100000000;
+  // setup the DAC table and frequency
+  Set_Dac_Table(DAC_Ampl, DAC_DC, DAC_Table);
+  Set_DAC_Freq(5000);
+  // Start the DAC DMA and TIM6 time base to start 100Hz DAC output
+  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, DAC_SIZE, DAC_ALIGN_12B_R);
+  HAL_TIM_Base_Start(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,9 +147,9 @@ int main(void)
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -150,14 +164,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

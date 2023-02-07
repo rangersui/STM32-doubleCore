@@ -2202,6 +2202,9 @@
             <name>$PROJ_DIR$\..\CM4\Core\Src\adc.c</name>
           </file>
           <file>
+            <name>$PROJ_DIR$/../CM4/Core/Src/dac.c</name>
+          </file>
+          <file>
             <name>$PROJ_DIR$\..\CM4\Core\Src\dma.c</name>
           </file>
           <file>
@@ -2233,6 +2236,9 @@
           </file>
           <file>
             <name>$PROJ_DIR$\..\CM7\Core\Src\adc.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$/../CM7/Core/Src/dac.c</name>
           </file>
           <file>
             <name>$PROJ_DIR$\..\CM7\Core\Src\dma.c</name>
@@ -2313,6 +2319,12 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_exti.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_tim.c</name>
