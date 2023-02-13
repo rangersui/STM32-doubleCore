@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    tim.h
+  * @file    ltdc.h
   * @brief   This file contains all the function prototypes for
-  *          the tim.c file
+  *          the ltdc.c file
   ******************************************************************************
   * @attention
   *
@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TIM_H__
-#define __TIM_H__
+#ifndef __LTDC_H__
+#define __LTDC_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,27 +32,21 @@ extern "C" {
 
 /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim2;
-
-extern TIM_HandleTypeDef htim6;
+extern LTDC_HandleTypeDef hltdc;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_TIM2_Init(void);
-void MX_TIM6_Init(void);
-
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+void MX_LTDC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void User_Tim6_Freq(uint32_t _freq);
-void Set_DAC_Freq(uint32_t f_dac);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __TIM_H__ */
+#endif /* __LTDC_H__ */
 

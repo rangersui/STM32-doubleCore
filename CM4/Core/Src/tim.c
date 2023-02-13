@@ -47,7 +47,7 @@ void MX_TIM2_Init(void)
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 239;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
@@ -73,7 +73,7 @@ void MX_TIM2_Init(void)
 
 }
 /* TIM6 init function */
-void MX_TIM6_Init(uint16_t prescaler, uint16_t period)
+void MX_TIM6_Init(void)
 {
 
   /* USER CODE BEGIN TIM6_Init 0 */
@@ -86,9 +86,9 @@ void MX_TIM6_Init(uint16_t prescaler, uint16_t period)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = prescaler;
+  htim6.Init.Prescaler = 23;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = period;
+  htim6.Init.Period = 999;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -205,7 +205,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void User_Tim6_Freq(uint32_t _freq) // 形参为频率
+void User_Tim6_Freq(uint32_t _freq) // 形参为频�?
 {
   uint16_t _period;
   uint16_t _prescaler = 2;
@@ -217,10 +217,11 @@ void User_Tim6_Freq(uint32_t _freq) // 形参为频率
   // _period = APB2_FREQ / (_prescaler + 1) / _freq - 1;
   htim6.Init.Prescaler = _prescaler;
   htim6.Init.Period = _period;
-  MX_TIM6_Init(_prescaler,_period);
+  HAL_TIM_Base_Init(&htim6);
+  // MX_TIM6_Init(_prescaler,_period);
 }
 
-// 根据DAC要求的频率，计算TIM6的频率
+// 根据DAC要求的频率，计算TIM6的频�?
 void Set_DAC_Freq(uint32_t f_dac)
 {
   uint32_t f_tim6;

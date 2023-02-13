@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "ltdc.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -62,7 +63,20 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+// void ButterLPF_5000Hz(float *src_arr, float *dest_array)
+// {
+//   for (int n = 0; n < ADC_SIZE; n++)
+//   {
+//     if (n == 0)
+//     {
+//       dest_array[n] = b[0] * src_arr[n];
+//     }
+//     else
+//     {
+//       dest_array[n] = b[0] * src_arr[n] + b[1] * src_arr[n - 1] - a[1] * dest_array[n - 1];
+//     }
+//   }
+// }
 /* USER CODE END 0 */
 
 /**
@@ -126,7 +140,13 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_TIM2_Init();
+  MX_LTDC_Init();
   /* USER CODE BEGIN 2 */
+  // Enable the LCD display, DE signal and BL signal
+  
+  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_7,GPIO_PIN_SET); // PD7 DISP signal
+  // HAL_GPIO_WritePin(GPIOK,GPIO_PIN_7,GPIO_PIN_SET); //PK7 DE Signal
+
   HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
   // // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
   // HAL_TIM_Base_Start(&htim2);

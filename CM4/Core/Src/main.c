@@ -107,7 +107,7 @@ int main(void)
   MX_ADC3_Init();
   MX_GPIO_Init();
   MX_DAC1_Init();
-  MX_TIM6_Init(0,12000);
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   MX_TIM2_Init();
   // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
