@@ -341,7 +341,7 @@ extern "C" {
 /**
   * @brief   AF 14 selection
   */
-#define GPIO_AF14_LTDC         ((uint8_t)0x0E)   /* LTDC Alternate Function mapping  */
+#define cGPIO_AF14_LTDC         ((uint8_t)0x0E)   /* LTDC Alternate Function mapping  */
 #define GPIO_AF14_UART5        ((uint8_t)0x0E)   /* UART5 Alternate Function mapping */
 #if defined(TIM24)
 #define GPIO_AF14_TIM24        ((uint8_t)0x0E)   /* TIM24 Alternate Function mapping */
