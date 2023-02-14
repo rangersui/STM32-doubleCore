@@ -41,7 +41,7 @@ extern LTDC_HandleTypeDef hltdc;
 void MX_LTDC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+extern uint32_t RGB565_480x272[65280];
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

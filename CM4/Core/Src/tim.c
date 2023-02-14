@@ -205,7 +205,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void User_Tim6_Freq(uint32_t _freq) // 形参为频�?
+void User_Tim6_Freq(uint32_t _freq) // 形参为频�??
 {
   uint16_t _period;
   uint16_t _prescaler = 2;
@@ -221,7 +221,7 @@ void User_Tim6_Freq(uint32_t _freq) // 形参为频�?
   // MX_TIM6_Init(_prescaler,_period);
 }
 
-// 根据DAC要求的频率，计算TIM6的频�?
+// 根据DAC要求的频率，计算TIM6的频�??
 void Set_DAC_Freq(uint32_t f_dac)
 {
   uint32_t f_tim6;

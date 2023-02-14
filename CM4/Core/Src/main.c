@@ -19,9 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
-#include "dac.h"
 #include "dma.h"
-#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -51,7 +49,7 @@
 //  intialize the shared memory and value array
 volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared memory address pointer, points to the shared memory array in SDRAM
 uint16_t sharedADCValue[ADC_SIZE] = {0};                             // shared memory array, stores in CM4's SRAM
-uint16_t DAC_Table[DAC_SIZE] = {0};                                  // DAC table, stores in CM4's RAM
+// uint16_t DAC_Table[DAC_SIZE] = {0};                                  // DAC table, stores in CM4's RAM
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,8 +104,6 @@ int main(void)
   MX_DMA_Init();
   MX_ADC3_Init();
   MX_GPIO_Init();
-  MX_DAC1_Init();
-  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   MX_TIM2_Init();
   // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
@@ -119,11 +115,11 @@ int main(void)
   uint16_t DAC_DC = 2048;
   // uint32_t DAC_Freq = 100000000;
   // setup the DAC table and frequency
-  Set_Dac_Table(DAC_Ampl, DAC_DC, DAC_Table);
-  Set_DAC_Freq(5000);
+  // Set_Dac_Table(DAC_Ampl, DAC_DC, DAC_Table);
+  // Set_DAC_Freq(5000);
   // Start the DAC DMA and TIM6 time base to start 100Hz DAC output
-  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, DAC_SIZE, DAC_ALIGN_12B_R);
-  HAL_TIM_Base_Start(&htim6);
+  // HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, DAC_SIZE, DAC_ALIGN_12B_R);
+  // HAL_TIM_Base_Start(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */

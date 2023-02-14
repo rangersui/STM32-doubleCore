@@ -179,7 +179,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
     // memory is still busy, skip this conversion
     return;
   }
-  else if (HAL_HSEM_Take(HSEM_ID_0_ADCOK, 0) == HAL_OK)
+  else if (HAL_HSEM_FastTake(HSEM_ID_0_ADCOK) == HAL_OK)
   {
     for (uint32_t i = 0; i < ADC_SIZE; i++)
     {
