@@ -56,7 +56,7 @@ volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared m
 uint16_t rawArray[ADC_SIZE];
 uint16_t DAC_Table[ADC_SIZE];
 float ftmp[ADC_SIZE] = {0};
-uint32_t wave[480];
+uint16_t wave[480];
 uint32_t Notif_Recieved = 0;
 uint16_t i;
 uint16_t j;
@@ -169,11 +169,26 @@ int main(void)
     // take the semaphore to read the shared memory
     // HAL_HSEM_FastTake(HSEM_ID_0_ADCOK);
 
+    // if (Notif_Recieved == 0)
+    //   continue;
+    // HAL_HSEM_FastTake(0);
+    // perform linear interpolation to transform 1000 points to 480 points on LCD
     if (Notif_Recieved == 0)
+    {
       continue;
-    // perform linear interpolation to transform 1000 points to 480 points on LCD、
+    }
+
+    for (i = 0; i < ADC_SIZE; i++)
+    {
+      rawArray[i] = sharedMemoryAddress[i];
+    }
+    HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
     Linear_Interpolation(rawArray, ADC_SIZE, wave, 480);
 
+    for (i = 0; i < 480; i++)
+    {
+      RGB565_480x272[i + wave[i] * 480] = 0;
+    }
     // preprocess the wave
     for (i = 0; i < 480; i++)
     {
@@ -275,22 +290,13 @@ void SystemClock_Config(void)
 // Once the HSEM is released, store the data in the shared memory
 void HAL_HSEM_FreeCallback(uint32_t SemMask)
 {
+  Notif_Recieved = 1;
   if (HAL_HSEM_FastTake(HSEM_ID_0_ADCOK) == HAL_OK)
   {
-    for (i = 0; i < ADC_SIZE; i++)
-    {
-      rawArray[i] = sharedMemoryAddress[i];
-    }
-    for (i = 0; i < 480; i++)
-    {
-      RGB565_480x272[i + wave[i] * 480] = 0;
-    }
-    HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
     HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
   }
   else
     return;
-  Notif_Recieved = 1;
 }
 /* USER CODE END 4 */
 

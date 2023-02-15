@@ -16,7 +16,7 @@
  * @param converted_array 
  * @param converted_array_len 
  */
-void Linear_Interpolation(uint16_t *array, size_t array_len, uint32_t *converted_array, size_t converted_array_len)
+void Linear_Interpolation(uint16_t *array, size_t array_len, uint16_t *converted_array, size_t converted_array_len)
 {
   // calculate step size
   double step = (double)(array_len - 1) / (double)(converted_array_len - 1);
@@ -29,6 +29,11 @@ void Linear_Interpolation(uint16_t *array, size_t array_len, uint32_t *converted
     size_t idx2 = idx1 + 1;
     double frac = index - idx1;
     converted_array[i] = (uint16_t)((1.0 - frac) * array[idx1] + frac * array[idx2]);
+    if (converted_array[i]>=UINT16_MAX)
+    {
+      converted_array[i] = UINT16_MAX;
+    }
+    
   }
 }
 /**

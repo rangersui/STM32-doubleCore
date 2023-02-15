@@ -45,7 +45,7 @@ extern "C" {
     @retval None
 */
 void ButterLPF_5000Hz(float *src_arr, float *dest_arr);
-void Linear_Interpolation(uint16_t *array, size_t array_len, uint32_t *converted_array, size_t converted_array_len);
+void Linear_Interpolation(uint16_t *array, size_t array_len, uint16_t *converted_array, size_t converted_array_len);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
