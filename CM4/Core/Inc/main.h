@@ -54,7 +54,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+extern uint32_t Notif_Recieved;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

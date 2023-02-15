@@ -44,7 +44,8 @@ void MX_TIM2_Init(void);
 void MX_TIM6_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void User_Tim6_Freq(uint32_t _freq);
+void Set_DAC_Freq(uint32_t f_dac);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

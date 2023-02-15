@@ -19,7 +19,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dac.h"
 #include "dma.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -50,6 +52,7 @@
 volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared memory address pointer, points to the shared memory array in SDRAM
 uint16_t sharedADCValue[ADC_SIZE] = {0};                             // shared memory array, stores in CM4's SRAM
 // uint16_t DAC_Table[DAC_SIZE] = {0};                                  // DAC table, stores in CM4's RAM
+uint32_t Notif_Recieved = 0;                                          // notification flag
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -104,6 +107,8 @@ int main(void)
   MX_DMA_Init();
   MX_ADC3_Init();
   MX_GPIO_Init();
+  MX_DAC1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   MX_TIM2_Init();
   // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
@@ -139,7 +144,11 @@ int main(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_HSEM_FreeCallback(uint32_t SemMask)
+{
+  // HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
+  Notif_Recieved = 1;
+}
 /* USER CODE END 4 */
 
 /**

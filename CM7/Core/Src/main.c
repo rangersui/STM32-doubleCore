@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "dac.h"
 #include "dma.h"
 #include "ltdc.h"
 #include "tim.h"
@@ -28,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "adc.h"
 #include "dac.h"
+#include "filter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,11 +53,14 @@
 
 /* USER CODE BEGIN PV */
 volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared memory address pointer, points to the shared memory array in SDRAM
-uint16_t array[ADC_SIZE];
+uint16_t rawArray[ADC_SIZE];
 uint16_t DAC_Table[ADC_SIZE];
 float ftmp[ADC_SIZE] = {0};
 uint32_t wave[480];
 uint32_t Notif_Recieved = 0;
+uint16_t i;
+uint16_t j;
+const int MIDDLE_LINE_INDEX = 480 * 136 / 2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,58 +71,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void User_Tim6_Freq(uint32_t _freq) // 形参为频�?
-{
-  uint16_t _period;
-  uint16_t _prescaler = 2;
-  float ftmp;
-  ftmp = 240000000 / (_prescaler + 1) / _freq - 1;
-  // 频率计算
-  _period = (uint16_t)ftmp;
 
-  // _period = APB2_FREQ / (_prescaler + 1) / _freq - 1;
-  htim6.Init.Prescaler = _prescaler;
-  htim6.Init.Period = _period;
-  HAL_TIM_Base_Init(&htim6);
-  // MX_TIM6_Init(_prescaler,_period);
-}
-// 根据DAC要求的频率，计算TIM6的频率
-void Set_DAC_Freq(uint32_t f_dac)
-{
-  uint32_t f_tim6;
-
-  f_tim6 = f_dac * ADC_SIZE;
-  User_Tim6_Freq(f_tim6);
-}
-void linear_interpolation(uint16_t *array, size_t array_len, uint32_t *converted_array, size_t converted_array_len)
-{
-  // 计算相邻元素之间的步长
-  double step = (double)(array_len - 1) / (converted_array_len - 1);
-
-  // 执行线性插值
-  for (size_t i = 0; i < converted_array_len; i++)
-  {
-    double index = i * step;
-    size_t idx1 = (size_t)index;
-    size_t idx2 = idx1 + 1;
-    double frac = index - idx1;
-    converted_array[i] = (uint16_t)((1.0 - frac) * array[idx1] + frac * array[idx2]);
-  }
-}
-// void ButterLPF_5000Hz(float *src_arr, float *dest_array)
-// {
-//   for (int n = 0; n < ADC_SIZE; n++)
-//   {
-//     if (n == 0)
-//     {
-//       dest_array[n] = b[0] * src_arr[n];
-//     }
-//     else
-//     {
-//       dest_array[n] = b[0] * src_arr[n] + b[1] * src_arr[n - 1] - a[1] * dest_array[n - 1];
-//     }
-//   }
-// }
 /* USER CODE END 0 */
 
 /**
@@ -134,6 +86,12 @@ int main(void)
   /* USER CODE BEGIN Boot_Mode_Sequence_0 */
   int32_t timeout;
   /* USER CODE END Boot_Mode_Sequence_0 */
+
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
+
+  /* Enable D-Cache---------------------------------------------------------*/
+  SCB_EnableDCache();
 
   /* USER CODE BEGIN Boot_Mode_Sequence_1 */
   /* Wait until CPU2 boots and enters in stop mode or timeout*/
@@ -183,23 +141,11 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_TIM2_Init();
-  MX_DAC1_Init();
-  MX_TIM6_Init();
   MX_LTDC_Init();
   /* USER CODE BEGIN 2 */
 
-  int start_index = 480 * 136 / 2;
-
-  //
-  for (int i = start_index; i < start_index + 480 * 3; i++)
-  {
-    RGB565_480x272[i] = 0x8400;
-  }
-
-  // Enable the LCD display, DE signal and BL signal
-
+  // Enable the DISP signal to the LCD panel
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET); // PD7 DISP signal
-  // HAL_GPIO_WritePin(GPIOK,GPIO_PIN_7,GPIO_PIN_SET); //PK7 DE Signal
 
   HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
   // // Start the PWM timer and ADC DMA to start 60kHz PWM and ADC sampling
@@ -208,7 +154,6 @@ int main(void)
   // HAL_ADC_Start_DMA(&hadc3, (uint32_t *)rawADCValue, ADC_SIZE);
   Set_DAC_Freq(1000);
   HAL_TIM_Base_Start(&htim6);
-  // HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, ADC_SIZE, DAC_ALIGN_12B_R);
 
   /* USER CODE END 2 */
 
@@ -216,73 +161,47 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // for (size_t i = 0; i < 1000; i++)
+
+    // while (HAL_HSEM_IsSemTaken(HSEM_ID_0_ADCOK))
     // {
-    //   array[i] = sharedMemoryAddress[i];
     // }
-    // LD8 flashes when functioning properly
-    Notif_Recieved = 0;
-    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
-    while (HAL_HSEM_IsSemTaken(HSEM_ID_0_ADCOK))
-    {
-    }
+
     // take the semaphore to read the shared memory
-    HAL_HSEM_FastTake(HSEM_ID_0_ADCOK);
-    for (size_t i = 0; i < ADC_SIZE; i++)
+    // HAL_HSEM_FastTake(HSEM_ID_0_ADCOK);
+
+    if (Notif_Recieved == 0)
+      continue;
+    // perform linear interpolation to transform 1000 points to 480 points on LCD、
+    Linear_Interpolation(rawArray, ADC_SIZE, wave, 480);
+
+    // preprocess the wave
+    for (i = 0; i < 480; i++)
     {
-      array[i] = sharedMemoryAddress[i];
-    }
-    // convert the 16 bit ADC value to 12 bit DAC value and output through dma
-    for (size_t i = 0; i < ADC_SIZE; i++)
-    {
-      ftmp[i] = array[i] * 4096.0f / 65536.0f;
-      DAC_Table[i] = (uint16_t)ftmp[i];
-    };
-    // perform linear interpolation to get 480 points on LCD
-    linear_interpolation(array, ADC_SIZE, wave, 480);
-    // map from 0-65535 to 0-271
-    for (size_t i = 0; i < 480; i++)
-    {
+      // map the 16 bit wave value to 0-271
       wave[i] = (uint16_t)((float)wave[i] * 271.0f / 65535.0f);
     }
 
-    const uint16_t pixels_per_row = 480;
+    // draw the wave
+    for (i = 0; i < 480; i++)
+    {
+      RGB565_480x272[i + wave[i] * 480] = 0x8400;
+    }
 
-    // // 遍历每一行
-    // for (uint16_t row = 0; row < 136; row++)
+    // draw the horizontal baseline
+    for (int i = MIDDLE_LINE_INDEX; i < MIDDLE_LINE_INDEX + 480; i++)
+    {
+      RGB565_480x272[i] = 0x8400;
+    }
+    Notif_Recieved = 0;
+    // convert the 16 bit ADC value to 12 bit DAC value and output through dma
+    // for (i = 0; i < ADC_SIZE; i++)
     // {
-    //   // 计算屏幕上的像素点的索引
-    //   uint32_t pixel_index = row * pixels_per_row;
+    //   ftmp[i] = rawArray[i] * 4096.0f / 65536.0f;
+    //   DAC_Table[i] = (uint16_t)ftmp[i];
+    // };
 
-    //   // 将波形幅度值映射到屏幕上的行数
-    //   uint16_t mapped_row = wave[row];
+    // HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, ADC_SIZE, DAC_ALIGN_12B_R);
 
-    //   // 在第一列的对应位置画出一个点
-    //   if (row == mapped_row)
-    //   {
-    //     RGB565_480x272[pixel_index] = 0x8400; // 设置为黑色
-    //   }
-    //   else
-    //   {
-    //     RGB565_480x272[pixel_index] = 0x00; // 设置为黄色
-    //   }
-    // }
-
-    HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, ADC_SIZE, DAC_ALIGN_12B_R);
-    HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
-
-    // HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
-    // HAL_Delay(5000);
-    // HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
-    // HAL_Delay(500);
-    // // LD7 flashes when functioning properly
-    // HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
-    // HAL_Delay(5000);
-    // HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
-    // HAL_Delay(10);
-
-    // HAL_UART_Transmit(&huart1, (uint8_t *)"OUT", sizeof("OUT"), 10);
-    // HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -356,7 +275,21 @@ void SystemClock_Config(void)
 // Once the HSEM is released, store the data in the shared memory
 void HAL_HSEM_FreeCallback(uint32_t SemMask)
 {
-  // HAL_GPIO_TogglePin(LD8_GPIO_Port, LD8_Pin);
+  if (HAL_HSEM_FastTake(HSEM_ID_0_ADCOK) == HAL_OK)
+  {
+    for (i = 0; i < ADC_SIZE; i++)
+    {
+      rawArray[i] = sharedMemoryAddress[i];
+    }
+    for (i = 0; i < 480; i++)
+    {
+      RGB565_480x272[i + wave[i] * 480] = 0;
+    }
+    HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
+    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
+  }
+  else
+    return;
   Notif_Recieved = 1;
 }
 /* USER CODE END 4 */

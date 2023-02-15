@@ -64,9 +64,10 @@ void Error_Handler(void);
 #define OSC_IN_Pin GPIO_PIN_0
 #define OSC_IN_GPIO_Port GPIOH
 /* USER CODE BEGIN Private defines */
-// #ifndef HSEM_ID_0
-// #define HSEM_ID_0 (0U) /* HW semaphore 0*/
-// #endif
+#ifndef HSEM_ID_0
+#define HSEM_ID_0 (0U) /* HW semaphore 0*/
+#endif
+#define ADC_SIZE 1000
 #define HSEM_ID_0_ADCOK (0U) /* HW semaphore 0*/
 /* USER CODE END Private defines */
 

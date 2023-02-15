@@ -2863,6 +2863,15 @@
                 <group>
                     <name>Core</name>
                     <file>
+                        <name>$PROJ_DIR$\..\CM4\Core\Src\adc.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM4\Core\Src\dac.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM4\Core\Src\dma.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\CM4\Core\Src\gpio.c</name>
                     </file>
                     <file>
@@ -2874,6 +2883,9 @@
                     <file>
                         <name>$PROJ_DIR$\..\CM4\Core\Src\stm32h7xx_it.c</name>
                     </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM4\Core\Src\tim.c</name>
+                    </file>
                 </group>
             </group>
             <group>
@@ -2881,7 +2893,22 @@
                 <group>
                     <name>Core</name>
                     <file>
+                        <name>$PROJ_DIR$\..\CM7\Core\Src\adc.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM7\Core\Src\dac.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM7\Core\Src\dma.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM7\Core\Src\filter.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\CM7\Core\Src\gpio.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\CM7\Core\Src\ltdc.c</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\CM7\Core\Src\main.c</name>
@@ -2893,7 +2920,7 @@
                         <name>$PROJ_DIR$\..\CM7\Core\Src\stm32h7xx_it.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\CM7\Core\Src\usart.c</name>
+                        <name>$PROJ_DIR$\..\CM7\Core\Src\tim.c</name>
                     </file>
                 </group>
             </group>
@@ -2913,7 +2940,19 @@
                 <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_adc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_adc_ex.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_cortex.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_dac.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_dac_ex.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_dma.c</name>
@@ -2943,6 +2982,12 @@
                 <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_i2c_ex.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_ltdc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_ltdc_ex.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_mdma.c</name>
             </file>
             <file>
@@ -2962,12 +3007,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_tim_ex.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_uart.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_uart_ex.c</name>
             </file>
         </group>
     </group>

@@ -183,5 +183,27 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void User_Tim6_Freq(uint32_t _freq) // 形参为频�?
+{
+  uint16_t _period;
+  uint16_t _prescaler = 2;
+  float ftmp;
+  ftmp = 240000000 / (_prescaler + 1) / _freq - 1;
+  // 频率计算
+  _period = (uint16_t)ftmp;
 
+  // _period = APB2_FREQ / (_prescaler + 1) / _freq - 1;
+  htim6.Init.Prescaler = _prescaler;
+  htim6.Init.Period = _period;
+  HAL_TIM_Base_Init(&htim6);
+  // MX_TIM6_Init(_prescaler,_period);
+}
+// 根据DAC要求的频率，计算TIM6的频�?
+void Set_DAC_Freq(uint32_t f_dac)
+{
+  uint32_t f_tim6;
+
+  f_tim6 = f_dac * ADC_SIZE;
+  User_Tim6_Freq(f_tim6);
+}
 /* USER CODE END 1 */
