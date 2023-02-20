@@ -42,6 +42,8 @@
 // #define HSEM_ID_0 (0U) /* HW semaphore 0*
 // #endif
 #define SHARED_ADDRESS 0x30040000
+#define YELLOW 0x8400
+// #define USE_FULL_ASSERT 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,11 +58,11 @@ volatile uint16_t *sharedMemoryAddress = (uint16_t *)SHARED_ADDRESS; // shared m
 uint16_t rawArray[ADC_SIZE];
 uint16_t DAC_Table[ADC_SIZE];
 float ftmp[ADC_SIZE] = {0};
-uint16_t wave[480];
+uint16_t wave[480] = {0};
 uint32_t Notif_Recieved = 0;
 uint16_t i;
 uint16_t j;
-const int MIDDLE_LINE_INDEX = 480 * 136 / 2;
+const int MIDDLE_LINE_INDEX = RK043FN48H_WIDTH * RK043FN48H_HEIGHT / 4;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -161,60 +163,61 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-    // while (HAL_HSEM_IsSemTaken(HSEM_ID_0_ADCOK))
-    // {
-    // }
-
-    // take the semaphore to read the shared memory
-    // HAL_HSEM_FastTake(HSEM_ID_0_ADCOK);
-
-    // if (Notif_Recieved == 0)
-    //   continue;
-    // HAL_HSEM_FastTake(0);
-    // perform linear interpolation to transform 1000 points to 480 points on LCD
     if (Notif_Recieved == 0)
     {
+      HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
       continue;
     }
+    else
+      Notif_Recieved = 0;
 
+    // read the shared memory
+    HAL_HSEM_Take(HSEM_ID_0_ADCOK, 0);
     for (i = 0; i < ADC_SIZE; i++)
     {
       rawArray[i] = sharedMemoryAddress[i];
     }
     HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
-    Linear_Interpolation(rawArray, ADC_SIZE, wave, 480);
 
-    for (i = 0; i < 480; i++)
+    // reset the hsem notification
+    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
+
+    // clear the former wave
+    for (i = 0; i < RK043FN48H_WIDTH; i++)
     {
-      RGB565_480x272[i + wave[i] * 480] = 0;
+      RGB565_480x272[i + wave[i] * RK043FN48H_WIDTH] = 0;
     }
-    // preprocess the wave
-    for (i = 0; i < 480; i++)
+
+    // convert 1000 points to 480 points
+    // NOTICE: now the wave index is out of range
+    Linear_Interpolation(rawArray, ADC_SIZE, wave, RK043FN48H_WIDTH);
+
+    // value mapping
+    for (i = 0; i < RK043FN48H_WIDTH; i++)
     {
-      // map the 16 bit wave value to 0-271
-      wave[i] = (uint16_t)((float)wave[i] * 271.0f / 65535.0f);
+
+      wave[i] = (uint16_t)((float)wave[i] * (float)(RK043FN48H_HEIGHT - 1) / (float)(UINT16_MAX - 1));
     }
 
     // draw the wave
-    for (i = 0; i < 480; i++)
+    for (i = 0; i < RK043FN48H_WIDTH; i++)
     {
-      RGB565_480x272[i + wave[i] * 480] = 0x8400;
+      RGB565_480x272[i + wave[i] * RK043FN48H_WIDTH] = YELLOW;
     }
 
     // draw the horizontal baseline
-    for (int i = MIDDLE_LINE_INDEX; i < MIDDLE_LINE_INDEX + 480; i++)
+    for (int i = MIDDLE_LINE_INDEX; i < MIDDLE_LINE_INDEX + RK043FN48H_WIDTH; i++)
     {
-      RGB565_480x272[i] = 0x8400;
+      RGB565_480x272[i] = YELLOW;
     }
-    Notif_Recieved = 0;
+
     // convert the 16 bit ADC value to 12 bit DAC value and output through dma
     // for (i = 0; i < ADC_SIZE; i++)
     // {
     //   ftmp[i] = rawArray[i] * 4096.0f / 65536.0f;
     //   DAC_Table[i] = (uint16_t)ftmp[i];
     // };
-
+    // DMA works in normal mode
     // HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)DAC_Table, ADC_SIZE, DAC_ALIGN_12B_R);
 
     /* USER CODE END WHILE */
@@ -291,12 +294,6 @@ void SystemClock_Config(void)
 void HAL_HSEM_FreeCallback(uint32_t SemMask)
 {
   Notif_Recieved = 1;
-  if (HAL_HSEM_FastTake(HSEM_ID_0_ADCOK) == HAL_OK)
-  {
-    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0_ADCOK));
-  }
-  else
-    return;
 }
 /* USER CODE END 4 */
 

@@ -21,9 +21,7 @@
 #include "ltdc.h"
 
 /* USER CODE BEGIN 0 */
-// #include "RGB565_480x272.h"
-#include "rk043fn48h.h"
-uint32_t RGB565_480x272[65280] = {0};
+volatile uint32_t RGB565_480x272[65280] = {0};
 /* USER CODE END 0 */
 
 LTDC_HandleTypeDef hltdc;
