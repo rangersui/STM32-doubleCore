@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "adc.h"
 #include "dac.h"
 #include "filter.h"
@@ -43,7 +44,6 @@
 // #endif
 #define SHARED_ADDRESS 0x30040000
 #define YELLOW 0x8400
-// #define USE_FULL_ASSERT 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -156,7 +156,6 @@ int main(void)
   // HAL_ADC_Start_DMA(&hadc3, (uint32_t *)rawADCValue, ADC_SIZE);
   Set_DAC_Freq(1000);
   HAL_TIM_Base_Start(&htim6);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -165,10 +164,10 @@ int main(void)
   {
     if (Notif_Recieved == 0)
     {
-      HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
+      // HAL_HSEM_Release(HSEM_ID_0_ADCOK, 0);
       continue;
     }
-    else
+    else if(Notif_Recieved == 1)
       Notif_Recieved = 0;
 
     // read the shared memory
@@ -197,6 +196,8 @@ int main(void)
     {
 
       wave[i] = (uint16_t)((float)wave[i] * (float)(RK043FN48H_HEIGHT - 1) / (float)(UINT16_MAX - 1));
+      // test if the wave index is out of range
+      assert_param(wave[i] < RK043FN48H_HEIGHT);
     }
 
     // draw the wave
@@ -326,6 +327,7 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
+  printf("Wrong parameters value: file %s on line %d\r\n", file, line);
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */

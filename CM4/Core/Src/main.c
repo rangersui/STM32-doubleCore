@@ -135,7 +135,7 @@ int main(void)
     HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
     HAL_Delay(5000);
     HAL_GPIO_TogglePin(LD7_GPIO_Port, LD7_Pin);
-    HAL_Delay(500);
+    HAL_Delay(2500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
